@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AlarmClock</string>
+    <string name="alarmOn">Включить</string>
+    <string name="alarmOff">Выключить</string>
+    <string name="updateAlarm">Включить будильник</string>
+    <string name="service_stopped">on Destroy called</string>
+    <string name="alarmTurnedOn">Будильник установлен на: </string>
+    <string name="alarmTurnedOff">Выключен!</string>
+    <string name="alarmTurnOff">Выключить будильник</string>
+</resources>
