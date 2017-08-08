@@ -7,4 +7,6 @@
     <string name="alarmTurnedOn">Будильник установлен на: </string>
     <string name="alarmTurnedOff">Выключен!</string>
     <string name="alarmTurnOff">Выключить будильник</string>
+    <string name="chanel_name">Будильник</string>
+    <string name="chanel_description">Оповещение пользователя</string>
 </resources>

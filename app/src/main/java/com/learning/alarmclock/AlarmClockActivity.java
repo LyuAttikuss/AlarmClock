@@ -2,13 +2,11 @@ package com.learning.alarmclock;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -43,6 +41,7 @@ public class AlarmClockActivity extends AppCompatActivity {
             public void onClick(View view) {
                 calendar.set(Calendar.HOUR_OF_DAY, mHour);
                 calendar.set(Calendar.MINUTE, mMinute);
+                calendar.set(Calendar.SECOND, 0);
 
                 String hour_string = String.valueOf(mHour);
                 String minute_string = String.valueOf(mMinute);
@@ -67,6 +66,9 @@ public class AlarmClockActivity extends AppCompatActivity {
         alarm_off.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pending_intent = PendingIntent.getBroadcast(AlarmClockActivity.this, 0,
+                        intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
                 alarm_manager.cancel(pending_intent);
 
                 intent.putExtra("Extra", "alarm off");
