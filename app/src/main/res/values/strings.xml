@@ -9,4 +9,16 @@
     <string name="alarmTurnOff">Выключить будильник</string>
     <string name="chanel_name">Будильник</string>
     <string name="chanel_description">Оповещение пользователя</string>
+    <string name="title_activity_alarm_preferences">AlarmPreferences</string>
+    <string name="every_day">Каждый день</string>
+    <string name="days_of_week">Дни недели</string>
+    <string name="weekends">Выходные</string>
+    <string name="every_week">Каждую неделю</string>
+    <string name="monday">пн</string>
+    <string name="tuesday">вт</string>
+    <string name="wednesday">ср</string>
+    <string name="thursday">чт</string>
+    <string name="friday">пт</string>
+    <string name="saturday">сб</string>
+    <string name="sunday">вс</string>
 </resources>
