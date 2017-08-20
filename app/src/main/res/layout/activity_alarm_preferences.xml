@@ -10,29 +10,39 @@
         android:weightSum="1">
 
     <RadioGroup
-        android:id="@+id/alarmType"
+        android:id="@+id/alarm_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <RadioButton
+            android:id="@+id/one_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/one_time"/>
+
+        <RadioButton
+            android:id="@+id/every_day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/every_day"/>
 
         <RadioButton
+            android:id="@+id/days_of_week"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/days_of_week"/>
 
         <RadioButton
+            android:id="@+id/weekends"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/weekends"/>
 
         <RadioButton
+            android:id="@+id/every_week"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/days_of_week"/>
+            android:text="@string/every_week"/>
 
     </RadioGroup>
 

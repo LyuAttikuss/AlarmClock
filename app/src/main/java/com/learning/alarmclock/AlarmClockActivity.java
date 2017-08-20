@@ -26,59 +26,57 @@ public class AlarmClockActivity extends AppCompatActivity {
     private static String ALARM_TIME = "time";
     private static String ALARM_DAYS = "days";
 
-    private AlarmManager alarm_manager;
-    private Button alarm_on;
-    private Button alarm_off;
-    private Button add;
-    private PendingIntent pending_intent;
-    private ListView alarmsList;
-
-    int mHour;
-    int mMinute;
+    private AlarmManager alarmManager;
+    private Button btnAlarmOn;
+    private Button btnAlarmOff;
+    private Button btnAdd;
+    private PendingIntent pendingIntent;
+    private ListView lvAlarmsList;
+    private AlarmAdapter alarmAdapter;
+    private ArrayList<Alarm> alarms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_clock);
 
-        alarm_manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarm_on = (Button) findViewById(R.id.alarmOn);
-        alarm_off = (Button) findViewById(R.id.alarmOff);
-        add = (Button) findViewById(R.id.add);
-        alarmsList = (ListView) findViewById(R.id.alarms_list);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        btnAlarmOn = (Button) findViewById(R.id.alarmOn);
+        btnAlarmOff = (Button) findViewById(R.id.alarmOff);
+        btnAdd = (Button) findViewById(R.id.add);
+        lvAlarmsList = (ListView) findViewById(R.id.alarms_list);
 
-        final ArrayList<HashMap<String, Object>> alarms = new ArrayList<>();
-
-        //final ArrayAdapter<String> adapter = new ArrayAdapter(this, R.layout.alarm_item, R.id.alarm_edit, alarms);
-        final SimpleAdapter adapter = new SimpleAdapter(this, alarms, R.layout.alarm_item, new String[]{ALARM_TITLE}, new int[]{R.id.alarm_edit});
-        alarmsList.setAdapter(adapter);
-
+        alarmAdapter = new AlarmAdapter(this);
+        lvAlarmsList.setAdapter(alarmAdapter);
+        alarms = new ArrayList<>();
         final Intent intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
 
-        alarmsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lvAlarmsList.setClickable(true);
+        lvAlarmsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showNotify(alarms.get(position).toString());
+                Alarm alarm = (Alarm) alarmAdapter.getItem(position);
                 Intent prefIntent = new Intent(AlarmClockActivity.this, AlarmPreferences.class);
+                prefIntent.putExtra("alarm", alarm);
                 startActivity(prefIntent);
             }
         });
 
         // TODO: move to AlertActivity
-        alarm_on.setOnClickListener(new View.OnClickListener() {
+        btnAlarmOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
 
-        alarm_off.setOnClickListener(new View.OnClickListener() {
+        btnAlarmOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pending_intent = PendingIntent.getBroadcast(AlarmClockActivity.this, 0,
+                pendingIntent = PendingIntent.getBroadcast(AlarmClockActivity.this, 0,
                         intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                alarm_manager.cancel(pending_intent);
+                alarmManager.cancel(pendingIntent);
 
                 intent.putExtra("Extra", "alarm off");
                 sendBroadcast(intent);
@@ -87,40 +85,41 @@ public class AlarmClockActivity extends AppCompatActivity {
             }
         });
 
-        add.setOnClickListener(new View.OnClickListener() {
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Calendar mCurrentTime = Calendar.getInstance();
-                int hour = mCurrentTime.get(Calendar.HOUR_OF_DAY);
-                int minute = mCurrentTime.get(Calendar.MINUTE);
+                final Calendar currentTime = Calendar.getInstance();
+                int hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int minute = currentTime.get(Calendar.MINUTE);
                 TimePickerDialog mTimePicker;
                 mTimePicker = new TimePickerDialog(AlarmClockActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        Calendar mChosenTime = Calendar.getInstance();
-                        mChosenTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        mChosenTime.set(Calendar.MINUTE, minute);
+                        Calendar chosenTime = Calendar.getInstance();
+                        chosenTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        chosenTime.set(Calendar.MINUTE, minute);
 
-                        Date mChosenDate = mChosenTime.getTime();
-                        Date mCurrentDate = mCurrentTime.getTime();
+                        Date chosenDate = chosenTime.getTime();
+                        Date currentDate = currentTime.getTime();
 
-                        mCurrentTime.set(Calendar.SECOND, 0);
-                        mCurrentTime.set(Calendar.MILLISECOND, 0);
+                        currentTime.set(Calendar.SECOND, 0);
+                        currentTime.set(Calendar.MILLISECOND, 0);
 
-                        if (mChosenDate.getTime() - mCurrentDate.getTime() <= 0) {
-                            mChosenTime.add(Calendar.DATE, 1);
-                            mChosenDate = mChosenTime.getTime();
+                        if (chosenDate.getTime() - currentDate.getTime() <= 0) {
+                            chosenTime.add(Calendar.DATE, 1);
+                            chosenDate = chosenTime.getTime();
                         }
 
-                        String remainingTime = calculateRemainingTime(mChosenDate, mCurrentDate);
+                        String remainingTime = calculateRemainingTime(chosenDate, currentDate);
                         SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
 
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(ALARM_TITLE, formatter.format(mChosenDate));
-                        hashMap.put(ALARM_TIME, mChosenTime);
-                        alarms.add(hashMap);
+                        Alarm alarm = new Alarm();
+                        alarm.setAlarmTime(chosenTime);
+                        alarm.setAlarmTitle(chosenDate);
+                        alarms.add(alarm);
+                        alarmAdapter.setAlarms(alarms);
 
-                        adapter.notifyDataSetChanged();
+                        alarmAdapter.notifyDataSetChanged();
 
                         setAlarm(hourOfDay, minute);
 
@@ -186,13 +185,13 @@ public class AlarmClockActivity extends AppCompatActivity {
         Intent intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
         intent.putExtra("Extra", "alarm on");
 
-        pending_intent = PendingIntent.getBroadcast(AlarmClockActivity.this,
+        pendingIntent = PendingIntent.getBroadcast(AlarmClockActivity.this,
                         0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-                alarmTime.getTimeInMillis(), 1000 * 60 * 1, pending_intent);
+                alarmTime.getTimeInMillis(), 1000 * 60 * 1, pendingIntent);
     }
 }
 

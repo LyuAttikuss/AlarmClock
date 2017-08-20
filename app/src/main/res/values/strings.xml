@@ -10,10 +10,11 @@
     <string name="chanel_name">Будильник</string>
     <string name="chanel_description">Оповещение пользователя</string>
     <string name="title_activity_alarm_preferences">AlarmPreferences</string>
-    <string name="every_day">Каждый день</string>
+    <string name="one_time">Один раз</string>
+    <string name="every_day">Ежедневно</string>
     <string name="days_of_week">Дни недели</string>
     <string name="weekends">Выходные</string>
-    <string name="every_week">Каждую неделю</string>
+    <string name="every_week">Еженедельно</string>
     <string name="monday">пн</string>
     <string name="tuesday">вт</string>
     <string name="wednesday">ср</string>
