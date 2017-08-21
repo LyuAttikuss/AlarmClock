@@ -22,4 +22,5 @@
     <string name="friday">пт</string>
     <string name="saturday">сб</string>
     <string name="sunday">вс</string>
+    <string name="save">Сохранить</string>
 </resources>

@@ -4,11 +4,27 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.RadioGroup;
 
+import java.util.ArrayList;
+
 public class AlarmPreferences extends AppCompatActivity {
+    private AlarmAdapter alarmAdapter;
+
     private RadioGroup btnType;
+    private Button chkMonday;
+    private CheckBox chkTuesday;
+    private CheckBox chkWednesday;
+    private CheckBox chkThursday;
+    private CheckBox chkFriday;
+    private CheckBox chkSaturday;
+    private CheckBox chkSunday;
+    private Button btnSave;
     Alarm alarm;
+    Integer[] alarmDays;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,13 +34,24 @@ public class AlarmPreferences extends AppCompatActivity {
         Intent intent = getIntent();
         alarm = (Alarm) intent.getExtras().get("alarm");
 
+        chkMonday = (CheckBox) findViewById(R.id.monday);
+        chkTuesday = (CheckBox) findViewById(R.id.tuesday);
+        chkWednesday = (CheckBox) findViewById(R.id.wednesday);
+        chkThursday = (CheckBox) findViewById(R.id.thursday);
+        chkFriday = (CheckBox) findViewById(R.id.friday);
+        chkSaturday = (CheckBox) findViewById(R.id.saturday);
+        chkSunday = (CheckBox) findViewById(R.id.sunday);
+        btnSave = (Button) findViewById(R.id.save);
+
         btnType = (RadioGroup) findViewById(R.id.alarm_type);
         btnType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                View typeGroup = group.findViewById(checkedId);
+                int index = group.indexOfChild(typeGroup);
                 Integer[] days = {};
 
-                switch (checkedId) {
+                switch (index) {
                     case 0:
                         alarm.setDays(days);
                         alarm.setFrequency("Один раз");
@@ -45,6 +72,15 @@ public class AlarmPreferences extends AppCompatActivity {
                         alarm.setDays(days);
                         alarm.setFrequency("Еженедельно");
                 }
+            }
+        });
+
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
 

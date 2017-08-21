@@ -58,11 +58,11 @@ public class AlarmClockActivity extends AppCompatActivity {
                 Alarm alarm = (Alarm) alarmAdapter.getItem(position);
                 Intent prefIntent = new Intent(AlarmClockActivity.this, AlarmPreferences.class);
                 prefIntent.putExtra("alarm", alarm);
-                startActivity(prefIntent);
+                startActivityForResult(prefIntent, 0);
             }
         });
 
-        // TODO: move to AlertActivity
+
         btnAlarmOn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,6 +70,7 @@ public class AlarmClockActivity extends AppCompatActivity {
             }
         });
 
+        // TODO: move to AlertActivity
         btnAlarmOff.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +133,14 @@ public class AlarmClockActivity extends AppCompatActivity {
                 mTimePicker.show();
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            alarmAdapter.notifyDataSetChanged();
+        }
     }
 
     private void showNotify(String notification) {
