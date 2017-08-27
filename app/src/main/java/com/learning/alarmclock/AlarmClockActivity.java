@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -34,6 +35,7 @@ public class AlarmClockActivity extends AppCompatActivity {
     private ListView lvAlarmsList;
     private AlarmAdapter alarmAdapter;
     private ArrayList<Alarm> alarms;
+    private int currentAlarmId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class AlarmClockActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Alarm alarm = (Alarm) alarmAdapter.getItem(position);
+                currentAlarmId = position;
                 Intent prefIntent = new Intent(AlarmClockActivity.this, AlarmPreferences.class);
                 prefIntent.putExtra("alarm", alarm);
                 startActivityForResult(prefIntent, 0);
@@ -112,7 +115,6 @@ public class AlarmClockActivity extends AppCompatActivity {
                         }
 
                         String remainingTime = calculateRemainingTime(chosenDate, currentDate);
-                        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
 
                         Alarm alarm = new Alarm();
                         alarm.setAlarmTime(chosenTime);
@@ -123,6 +125,8 @@ public class AlarmClockActivity extends AppCompatActivity {
                         alarmAdapter.notifyDataSetChanged();
 
                         setAlarm(hourOfDay, minute);
+
+                        //Database.create(alarm);
 
                         showNotify("Будильник зазвонит через " + remainingTime);
                     }
@@ -139,7 +143,12 @@ public class AlarmClockActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            alarmAdapter.notifyDataSetChanged();
+            if (data.getExtras().get("alarm") != null) {
+                Alarm resultAlarm = (Alarm) data.getExtras().get("alarm");
+                Alarm updatedAlarm = (Alarm) alarmAdapter.getItem(currentAlarmId);
+                updatedAlarm = resultAlarm;
+                alarmAdapter.notifyDataSetChanged();
+            }
         }
     }
 

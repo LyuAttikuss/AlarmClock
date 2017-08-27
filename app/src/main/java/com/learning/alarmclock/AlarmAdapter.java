@@ -53,4 +53,9 @@ public class AlarmAdapter extends BaseAdapter {
     public void setAlarms(ArrayList<Alarm> alarms) {
         this.alarms = alarms;
     }
+
+    public void updateAlarm(int position, Alarm alarm) {
+        Alarm updatedAlarm = alarms.get(position);
+        updatedAlarm = alarm;
+    }
 }
