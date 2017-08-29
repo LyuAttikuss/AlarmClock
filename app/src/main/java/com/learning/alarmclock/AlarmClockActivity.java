@@ -4,22 +4,20 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 public class AlarmClockActivity extends AppCompatActivity {
@@ -34,8 +32,9 @@ public class AlarmClockActivity extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private ListView lvAlarmsList;
     private AlarmAdapter alarmAdapter;
-    private ArrayList<Alarm> alarms;
+    private Cursor alarms;
     private int currentAlarmId;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +47,14 @@ public class AlarmClockActivity extends AppCompatActivity {
         btnAdd = (Button) findViewById(R.id.add);
         lvAlarmsList = (ListView) findViewById(R.id.alarms_list);
 
-        alarmAdapter = new AlarmAdapter(this);
+        // Инициализация БД
+        AlarmsOpenHelper.init(getBaseContext());
+        alarms = AlarmsOpenHelper.getAlarms();
+        alarmAdapter = new AlarmAdapter(this, alarms);
         lvAlarmsList.setAdapter(alarmAdapter);
-        alarms = new ArrayList<>();
-        final Intent intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
 
-        lvAlarmsList.setClickable(true);
+        intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
+
         lvAlarmsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -114,20 +115,21 @@ public class AlarmClockActivity extends AppCompatActivity {
                             chosenDate = chosenTime.getTime();
                         }
 
-                        String remainingTime = calculateRemainingTime(chosenDate, currentDate);
-
+                        // Сохранение будильника
                         Alarm alarm = new Alarm();
                         alarm.setAlarmTime(chosenTime);
                         alarm.setAlarmTitle(chosenDate);
-                        alarms.add(alarm);
-                        alarmAdapter.setAlarms(alarms);
+                        AlarmsOpenHelper.create(alarm);
 
-                        alarmAdapter.notifyDataSetChanged();
-
+                        // Установка
                         setAlarm(hourOfDay, minute);
 
-                        //Database.create(alarm);
+                        // Обновление списка
+                        alarms = AlarmsOpenHelper.getAlarms();
+                        alarmAdapter.changeCursor(alarms);
+                        alarmAdapter.notifyDataSetChanged();
 
+                        String remainingTime = calculateRemainingTime(chosenDate, currentDate);
                         showNotify("Будильник зазвонит через " + remainingTime);
                     }
                 }, hour, minute, true);
@@ -145,9 +147,8 @@ public class AlarmClockActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (data.getExtras().get("alarm") != null) {
                 Alarm resultAlarm = (Alarm) data.getExtras().get("alarm");
-                Alarm updatedAlarm = (Alarm) alarmAdapter.getItem(currentAlarmId);
-                updatedAlarm = resultAlarm;
                 alarmAdapter.notifyDataSetChanged();
+                AlarmsOpenHelper.update(resultAlarm, currentAlarmId);
             }
         }
     }
