@@ -1,11 +1,15 @@
 package com.learning.alarmclock;
 
 import android.app.AlarmManager;
+import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -32,7 +36,8 @@ public class AlarmClockActivity extends AppCompatActivity {
     private PendingIntent pendingIntent;
     private ListView lvAlarmsList;
     private AlarmAdapter alarmAdapter;
-    private Cursor alarms;
+    private ArrayList alarms;
+    private Cursor alarmsDb;
     private int currentAlarmId;
     private Intent intent;
 
@@ -48,9 +53,10 @@ public class AlarmClockActivity extends AppCompatActivity {
         lvAlarmsList = (ListView) findViewById(R.id.alarms_list);
 
         // Инициализация БД
-        AlarmsOpenHelper.init(getBaseContext());
-        alarms = AlarmsOpenHelper.getAlarms();
-        alarmAdapter = new AlarmAdapter(this, alarms);
+        AlarmsOpenHelper.init(this);
+        alarmsDb = AlarmsOpenHelper.getAlarms();
+        alarmAdapter = new AlarmAdapter(this);
+        alarms = alarmAdapter.transformAlarms(alarmsDb);
         lvAlarmsList.setAdapter(alarmAdapter);
 
         intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
@@ -125,8 +131,9 @@ public class AlarmClockActivity extends AppCompatActivity {
                         setAlarm(hourOfDay, minute);
 
                         // Обновление списка
-                        alarms = AlarmsOpenHelper.getAlarms();
-                        alarmAdapter.changeCursor(alarms);
+                        alarmsDb = AlarmsOpenHelper.getAlarms();
+                        alarms = alarmAdapter.transformAlarms(alarmsDb);
+                        alarmAdapter.setAlarms(alarms);
                         alarmAdapter.notifyDataSetChanged();
 
                         String remainingTime = calculateRemainingTime(chosenDate, currentDate);
@@ -212,5 +219,29 @@ public class AlarmClockActivity extends AppCompatActivity {
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
                 alarmTime.getTimeInMillis(), 1000 * 60 * 1, pendingIntent);
     }
+
+    /*
+    Uri??
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] columns = new String[] {
+                AlarmsOpenHelper.COLUMN_ALARM_ID,
+                AlarmsOpenHelper.COLUMN_ALARM_TITLE,
+                AlarmsOpenHelper.COLUMN_ALARM_TIME,
+                AlarmsOpenHelper.COLUMN_ALARM_DAYS};
+
+        return new CursorLoader(this, alarms.getNotificationUri(), columns, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        alarmAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        alarmAdapter.swapCursor(null);
+    }*/
 }
 
