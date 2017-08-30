@@ -1,18 +1,18 @@
 package com.learning.alarmclock;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Date;
 
 public class AlarmAdapter extends BaseAdapter {
     private ArrayList<Alarm> alarms = new ArrayList<>();
@@ -45,7 +45,7 @@ public class AlarmAdapter extends BaseAdapter {
         TextView tvAlarmFrecuency = (TextView) view.findViewById(R.id.alarm_days);
         CheckBox chkAlarmSwitch = (CheckBox) view.findViewById(R.id.alarm_switch);
 
-        tvAlarmTitle.setText(alarm.alarmTitle);
+        tvAlarmTitle.setText(alarm.title);
         tvAlarmFrecuency.setText(alarm.frequency);
 
         return view;
@@ -56,13 +56,17 @@ public class AlarmAdapter extends BaseAdapter {
     }
 
     public ArrayList<Alarm> transformAlarms(Cursor cursor) {
+        alarms.clear();
         cursor.moveToFirst();
 
-        // Всегда пусто, иначе ничего не отобразится совсем
-        while (cursor.isAfterLast()) {
+        while (!cursor.isAfterLast()) {
             Alarm alarm = new Alarm();
-            alarm.alarmTitle = cursor.getString(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_TITLE));
+            alarm.id = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_ID));
+            alarm.title = cursor.getString(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_TITLE));
+            alarm.frequency = cursor.getString(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_DAYS));
+
             alarms.add(alarm);
+            cursor.moveToNext();
         }
 
         return alarms;

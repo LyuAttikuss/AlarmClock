@@ -1,15 +1,10 @@
 package com.learning.alarmclock;
 
 import android.app.AlarmManager;
-import android.app.LoaderManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
-import android.content.CursorLoader;
 import android.content.Intent;
-import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -38,7 +33,7 @@ public class AlarmClockActivity extends AppCompatActivity {
     private AlarmAdapter alarmAdapter;
     private ArrayList alarms;
     private Cursor alarmsDb;
-    private int currentAlarmId;
+    private long currentAlarmId;
     private Intent intent;
 
     @Override
@@ -65,7 +60,8 @@ public class AlarmClockActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Alarm alarm = (Alarm) alarmAdapter.getItem(position);
-                currentAlarmId = position;
+
+                currentAlarmId = alarm.id;
                 Intent prefIntent = new Intent(AlarmClockActivity.this, AlarmPreferences.class);
                 prefIntent.putExtra("alarm", alarm);
                 startActivityForResult(prefIntent, 0);
@@ -154,8 +150,11 @@ public class AlarmClockActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (data.getExtras().get("alarm") != null) {
                 Alarm resultAlarm = (Alarm) data.getExtras().get("alarm");
-                alarmAdapter.notifyDataSetChanged();
                 AlarmsOpenHelper.update(resultAlarm, currentAlarmId);
+                alarmsDb = AlarmsOpenHelper.getAlarms();
+                alarms = alarmAdapter.transformAlarms(alarmsDb);
+                alarmAdapter.setAlarms(alarms);
+                alarmAdapter.notifyDataSetChanged();
             }
         }
     }

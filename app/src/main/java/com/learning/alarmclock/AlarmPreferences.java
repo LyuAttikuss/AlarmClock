@@ -51,26 +51,32 @@ public class AlarmPreferences extends AppCompatActivity {
                 int index = group.indexOfChild(typeGroup);
                 Integer[] days = {};
 
+                // TODO: Установить будильники по дням
                 switch (index) {
                     case 0:
                         alarm.setDays(days);
                         alarm.setFrequency("Один раз");
+                        break;
                     case 1:
                         days = new Integer[]{0, 1, 2, 3, 4, 5, 6};
                         alarm.setDays(days);
                         alarm.setFrequency("Ежедневно");
+                        break;
                     case 2:
                         days = new Integer[]{0, 1, 2, 3, 4};
                         alarm.setDays(days);
                         alarm.setFrequency("Дни недели");
+                        break;
                     case 3:
                         days = new Integer[]{5, 6};
                         alarm.setDays(days);
                         alarm.setFrequency("Выходные");
+                        break;
                     case 4:
                         days = new Integer[]{};
                         alarm.setDays(days);
                         alarm.setFrequency("Еженедельно");
+                        break;
                 }
             }
         });

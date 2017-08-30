@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AlarmsOpenHelper extends SQLiteOpenHelper {
     static String DATABASE_NAME = "AlarmClock.db";
-    static int DATABASE_VERSION = 1;
+    static int DATABASE_VERSION = 5;
     static SQLiteDatabase database = null;
     static AlarmsOpenHelper instance = null;
 
@@ -45,14 +45,15 @@ public class AlarmsOpenHelper extends SQLiteOpenHelper {
         return getDatabase().insert(TABLE_NAME, null, cv);
     }
 
-    public static long update(Alarm alarm, int rowId) {
+    public static long update(Alarm alarm, long rowId) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_ALARM_DAYS, alarm.getFrequency());
 
         String currentRow = COLUMN_ALARM_ID + " LIKE ?";
-        String[] currentArgs = {String.valueOf(rowId + 1)};
+        String[] currentArgs = {String.valueOf(rowId)};
 
-        return getDatabase().update(TABLE_NAME, cv, currentRow, currentArgs);
+        int count = getDatabase().update(TABLE_NAME, cv, currentRow, currentArgs);
+        return count;
     }
 
     public static Cursor getAlarms() {
@@ -66,6 +67,8 @@ public class AlarmsOpenHelper extends SQLiteOpenHelper {
             };
 
         Cursor cursor = db.query(TABLE_NAME, columns, null, null, null, null, null);
+        //db.close();
+
         return cursor;
     }
 
