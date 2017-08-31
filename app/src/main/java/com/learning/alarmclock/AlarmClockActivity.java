@@ -5,12 +5,14 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -25,9 +27,8 @@ public class AlarmClockActivity extends AppCompatActivity {
     private static String ALARM_DAYS = "days";
 
     private AlarmManager alarmManager;
-    private Button btnAlarmOn;
     private Button btnAlarmOff;
-    private Button btnAdd;
+    private FloatingActionButton btnAdd;
     private PendingIntent pendingIntent;
     private ListView lvAlarmsList;
     private AlarmAdapter alarmAdapter;
@@ -42,9 +43,8 @@ public class AlarmClockActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alarm_clock);
 
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        btnAlarmOn = (Button) findViewById(R.id.alarmOn);
         btnAlarmOff = (Button) findViewById(R.id.alarmOff);
-        btnAdd = (Button) findViewById(R.id.add);
+        btnAdd = (FloatingActionButton) findViewById(R.id.add);
         lvAlarmsList = (ListView) findViewById(R.id.alarms_list);
 
         // Инициализация БД
@@ -65,14 +65,6 @@ public class AlarmClockActivity extends AppCompatActivity {
                 Intent prefIntent = new Intent(AlarmClockActivity.this, AlarmPreferences.class);
                 prefIntent.putExtra("alarm", alarm);
                 startActivityForResult(prefIntent, 0);
-            }
-        });
-
-
-        btnAlarmOn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
             }
         });
 

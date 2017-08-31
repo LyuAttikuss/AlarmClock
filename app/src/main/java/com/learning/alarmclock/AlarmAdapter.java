@@ -5,14 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class AlarmAdapter extends BaseAdapter {
     private ArrayList<Alarm> alarms = new ArrayList<>();
@@ -40,13 +37,21 @@ public class AlarmAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         view = LayoutInflater.from(alarmActivity).inflate(R.layout.alarm_item, null);
-        Alarm alarm = (Alarm) getItem(position);
+        final Alarm alarm = (Alarm) getItem(position);
         TextView tvAlarmTitle = (TextView) view.findViewById(R.id.alarm_title);
         TextView tvAlarmFrecuency = (TextView) view.findViewById(R.id.alarm_days);
-        CheckBox chkAlarmSwitch = (CheckBox) view.findViewById(R.id.alarm_switch);
+        Switch swAlarmSwitch = (Switch) view.findViewById(R.id.alarm_switch);
+
+        swAlarmSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                alarm.setIsActive(isChecked);
+            }
+        });
 
         tvAlarmTitle.setText(alarm.title);
         tvAlarmFrecuency.setText(alarm.frequency);
+        swAlarmSwitch.setChecked(alarm.isActive);
 
         return view;
     }
@@ -64,6 +69,9 @@ public class AlarmAdapter extends BaseAdapter {
             alarm.id = cursor.getLong(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_ID));
             alarm.title = cursor.getString(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_TITLE));
             alarm.frequency = cursor.getString(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_DAYS));
+
+            int isActive = cursor.getInt(cursor.getColumnIndexOrThrow(AlarmsOpenHelper.COLUMN_ALARM_IS_ACTIVE));
+            alarm.isActive = (isActive == 1) ? true : false;
 
             alarms.add(alarm);
             cursor.moveToNext();

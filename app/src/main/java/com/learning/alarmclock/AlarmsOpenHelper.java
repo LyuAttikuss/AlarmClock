@@ -8,15 +8,16 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AlarmsOpenHelper extends SQLiteOpenHelper {
     static String DATABASE_NAME = "AlarmClock.db";
-    static int DATABASE_VERSION = 5;
+    static int DATABASE_VERSION = 8;
     static SQLiteDatabase database = null;
     static AlarmsOpenHelper instance = null;
 
     public static String TABLE_NAME = "alarm";
     public static String COLUMN_ALARM_ID = "_id";
-    public static String COLUMN_ALARM_TITLE = "alarm_title";
-    public static String COLUMN_ALARM_TIME = "alarm_time";
-    public static String COLUMN_ALARM_DAYS = "alarm_days";
+    public static String COLUMN_ALARM_TITLE = "title";
+    public static String COLUMN_ALARM_TIME = "time";
+    public static String COLUMN_ALARM_DAYS = "days";
+    public static String COLUMN_ALARM_IS_ACTIVE = "active";
 
     public AlarmsOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -42,12 +43,18 @@ public class AlarmsOpenHelper extends SQLiteOpenHelper {
         cv.put(COLUMN_ALARM_TIME, alarm.getAlarmTitle());
         cv.put(COLUMN_ALARM_DAYS, alarm.getFrequency());
 
+        int isActive = alarm.getIsActive() ? 0 : 1;
+        cv.put(COLUMN_ALARM_IS_ACTIVE, isActive);
+
         return getDatabase().insert(TABLE_NAME, null, cv);
     }
 
     public static long update(Alarm alarm, long rowId) {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_ALARM_DAYS, alarm.getFrequency());
+
+        int isActive = alarm.getIsActive() ? 0 : 1;
+        cv.put(COLUMN_ALARM_IS_ACTIVE, isActive);
 
         String currentRow = COLUMN_ALARM_ID + " LIKE ?";
         String[] currentArgs = {String.valueOf(rowId)};
@@ -63,11 +70,11 @@ public class AlarmsOpenHelper extends SQLiteOpenHelper {
                 COLUMN_ALARM_ID,
                 COLUMN_ALARM_TITLE,
                 COLUMN_ALARM_TIME,
-                COLUMN_ALARM_DAYS
+                COLUMN_ALARM_DAYS,
+                COLUMN_ALARM_IS_ACTIVE
             };
 
         Cursor cursor = db.query(TABLE_NAME, columns, null, null, null, null, null);
-        //db.close();
 
         return cursor;
     }
@@ -78,7 +85,8 @@ public class AlarmsOpenHelper extends SQLiteOpenHelper {
                         + COLUMN_ALARM_ID + " INTEGER primary key autoincrement, "
                         + COLUMN_ALARM_TITLE + " TEXT NOT NULL, "
                         + COLUMN_ALARM_TIME + " TEXT NOT NULL, "
-                        + COLUMN_ALARM_DAYS + " TEXT NOT NULL)");
+                        + COLUMN_ALARM_DAYS + " TEXT NOT NULL, "
+                        + COLUMN_ALARM_IS_ACTIVE + " INTEGER NOT NULL)");
     }
 
     @Override

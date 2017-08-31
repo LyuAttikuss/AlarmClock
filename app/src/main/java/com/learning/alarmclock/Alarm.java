@@ -42,4 +42,12 @@ public class Alarm implements Serializable {
     public String getFrequency() {
         return frequency;
     }
+
+    public Boolean getIsActive() {
+        return this.isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
 }
