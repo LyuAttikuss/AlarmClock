@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -52,6 +51,7 @@ public class AlarmClockActivity extends AppCompatActivity {
         alarmsDb = AlarmsOpenHelper.getAlarms();
         alarmAdapter = new AlarmAdapter(this);
         alarms = alarmAdapter.transformAlarms(alarmsDb);
+        alarmsDb.close();
         lvAlarmsList.setAdapter(alarmAdapter);
 
         intent = new Intent(AlarmClockActivity.this, AlarmReceiver.class);
@@ -121,6 +121,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                         // Обновление списка
                         alarmsDb = AlarmsOpenHelper.getAlarms();
                         alarms = alarmAdapter.transformAlarms(alarmsDb);
+                        alarmsDb.close();
                         alarmAdapter.setAlarms(alarms);
                         alarmAdapter.notifyDataSetChanged();
 
@@ -145,6 +146,7 @@ public class AlarmClockActivity extends AppCompatActivity {
                 AlarmsOpenHelper.update(resultAlarm, currentAlarmId);
                 alarmsDb = AlarmsOpenHelper.getAlarms();
                 alarms = alarmAdapter.transformAlarms(alarmsDb);
+                alarmsDb.close();
                 alarmAdapter.setAlarms(alarms);
                 alarmAdapter.notifyDataSetChanged();
             }
